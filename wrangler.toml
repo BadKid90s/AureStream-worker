@@ -1,0 +1,19 @@
+name = "aurestream-worker"
+main = "src/index.ts"
+compatibility_date = "2025-06-09"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "aurestream-db"
+database_id = "placeholder-id"
+
+[vars]
+JWT_SECRET = "aurestream-dev-secret-change-me"
+
+[env.production]
+vars = { JWT_SECRET = "change-me-in-production" }
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "aurestream-db"
+database_id = "placeholder-id"
