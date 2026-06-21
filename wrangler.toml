@@ -1,4 +1,4 @@
-name = "aurestream-worker"
+name = "aurestream-api"
 main = "src/index.ts"
 compatibility_date = "2025-06-09"
 
