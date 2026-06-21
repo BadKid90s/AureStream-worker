@@ -33,9 +33,9 @@ subscriptionsRouter.get("/", requireAuth, async (c) => {
       id: "default-sub",
       name: "Chilix Tunnel Premium",
       url: "https://tunnel.chilix.ccwu.cc/sub?token=9acdf66961219ba1406bfd16a1bece07",
-      traffic_used: 12 * 1024 * 1024 * 1024,
-      traffic_total: 100 * 1024 * 1024 * 1024,
-      expire_time: Math.floor(Date.now() / 1000) + 30 * 24 * 3600,
+      traffic_used: 0,
+      traffic_total: 1024 * 1024 * 1024 * 1024, // 1 TB
+      expire_time: Math.floor(Date.now() / 1000) + 365 * 24 * 3600, // 1 year
       created_at: Math.floor(Date.now() / 1000) - 5 * 24 * 3600,
     }]
   }
@@ -56,9 +56,9 @@ subscriptionsRouter.get("/:id", requireAuth, async (c) => {
       id: "default-sub",
       name: "Chilix Tunnel Premium",
       url: "https://tunnel.chilix.ccwu.cc/sub?token=9acdf66961219ba1406bfd16a1bece07",
-      traffic_used: 12 * 1024 * 1024 * 1024,
-      traffic_total: 100 * 1024 * 1024 * 1024,
-      expire_time: Math.floor(Date.now() / 1000) + 30 * 24 * 3600,
+      traffic_used: 0,
+      traffic_total: 1024 * 1024 * 1024 * 1024, // 1 TB
+      expire_time: Math.floor(Date.now() / 1000) + 365 * 24 * 3600, // 1 year
       created_at: Math.floor(Date.now() / 1000) - 5 * 24 * 3600,
     })
   }
