@@ -178,27 +178,30 @@ subscriptionsRouter.delete("/:id", requireAuth, async (c) => {
   return c.body(null, 204)
 })
 
-// POST /subscriptions/:id/usage  — report traffic usage
+// POST /subscriptions/:id/usage  — report traffic usage (cumulative)
 subscriptionsRouter.post("/:id/usage", requireAuth, async (c) => {
   const userId = c.get("userId")
   const id = c.req.param("id")
   const body = await c.req.json()
   const parsed = z.object({
-    upload_add_download: z.number().int().min(0),
+    upload: z.number().int().min(0),
+    download: z.number().int().min(0),
   }).safeParse(body)
 
   if (!parsed.success) {
     return c.json({ error: "invalid_request", details: parsed.error.issues }, 400)
   }
 
+  const { upload, download } = parsed.data
+  const addedTraffic = upload + download
   const db = getDB()
 
   const sub = await db.prepare("SELECT id FROM subscriptions WHERE id = ? AND user_id = ?")
     .bind(id, userId).first()
   if (!sub) return c.json({ error: "not_found" }, 404)
 
-  await db.prepare("UPDATE subscriptions SET used_traffic = ? WHERE id = ?")
-    .bind(parsed.data.upload_add_download, id).run()
+  await db.prepare("UPDATE subscriptions SET used_traffic = used_traffic + ? WHERE id = ?")
+    .bind(addedTraffic, id).run()
 
   const updated = await db.prepare(
     "SELECT used_traffic, total_traffic FROM subscriptions WHERE id = ?"

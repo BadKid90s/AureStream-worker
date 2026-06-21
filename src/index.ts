@@ -16,11 +16,11 @@ app.use("*", async (c, next) => {
 app.use("*", cors())
 
 // Health check
-app.get("/health", (c) => c.json({ status: "ok" }))
+app.get("/api/health", (c) => c.json({ status: "ok" }))
 
 // Routes
-app.route("/auth", authRouter)
-app.route("/user", userRouter)
-app.route("/subscriptions", subscriptionsRouter)
+app.route("/api/auth", authRouter)
+app.route("/api/user", userRouter)
+app.route("/api/subscriptions", subscriptionsRouter)
 
 export default app

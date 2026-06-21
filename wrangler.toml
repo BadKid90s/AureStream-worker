@@ -5,7 +5,7 @@ compatibility_date = "2025-06-09"
 [[d1_databases]]
 binding = "DB"
 database_name = "aurestream-db"
-database_id = "placeholder-id"
+database_id = "e6cdae14-71ec-494c-9430-1997887eb2f4"
 
 [vars]
 JWT_SECRET = "aurestream-dev-secret-change-me"
@@ -16,4 +16,4 @@ vars = { JWT_SECRET = "change-me-in-production" }
 [[env.production.d1_databases]]
 binding = "DB"
 database_name = "aurestream-db"
-database_id = "placeholder-id"
+database_id = "e6cdae14-71ec-494c-9430-1997887eb2f4"
