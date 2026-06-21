@@ -5,7 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "wrangler dev",
-    "deploy": "wrangler deploy",
+    "build:bundle": "wrangler deploy --dry-run --outdir dist",
+    "build:obfuscate": "javascript-obfuscator dist/index.js --output dist/index.js --compact true --self-defending false --string-array true --string-array-encoding base64,rc4 --string-array-threshold 0.75 --rename-globals false --identifier-names-generator hexadecimal --unicode-escape-sequence true --control-flow-flattening true --control-flow-flattening-threshold 0.5 --dead-code-injection true --dead-code-injection-threshold 0.2",
+    "build": "pnpm run build:bundle && pnpm run build:obfuscate",
+    "deploy": "pnpm run build && wrangler deploy dist/index.js",
+    "deploy:dev": "wrangler deploy",
     "db:generate": "drizzle-kit generate",
     "db:push:local": "wrangler d1 execute aurestream-db --local --file=./drizzle/migrations.sql",
     "db:push": "wrangler d1 execute aurestream-db --file=./drizzle/migrations.sql",
@@ -22,6 +26,7 @@
     "@cloudflare/workers-types": "^4.20250609.0",
     "@types/jsonwebtoken": "^9.0.0",
     "drizzle-kit": "^0.31.0",
+    "javascript-obfuscator": "^5.4.3",
     "typescript": "^6.0.3",
     "vitest": "^4.1.0",
     "wrangler": "^4.6.0"
