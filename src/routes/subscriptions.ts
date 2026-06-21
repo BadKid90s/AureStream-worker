@@ -21,7 +21,7 @@ subscriptionsRouter.get("/", requireAuth, async (c) => {
   let results = rows.results.map((r) => ({
     id: r.id,
     name: r.name,
-    url: "https://tunnel.chilix.ccwu.cc/sub?token=9acdf66961219ba1406bfd16a1bece07",
+    url: r.subscription_url,
     traffic_used: r.used_traffic,
     traffic_total: r.total_traffic,
     expire_time: r.expire_time,
@@ -29,15 +29,37 @@ subscriptionsRouter.get("/", requireAuth, async (c) => {
   }))
 
   if (results.length === 0) {
-    results = [{
-      id: "default-sub",
-      name: "Chilix Tunnel Premium",
-      url: "https://tunnel.chilix.ccwu.cc/sub?token=9acdf66961219ba1406bfd16a1bece07",
-      traffic_used: 0,
-      traffic_total: 1024 * 1024 * 1024 * 1024, // 1 TB
-      expire_time: Math.floor(Date.now() / 1000) + 365 * 24 * 3600, // 1 year
-      created_at: Math.floor(Date.now() / 1000) - 5 * 24 * 3600,
-    }]
+    const newId = uid()
+    const uniqueToken = uid()
+    const urlObj = new URL(c.req.url)
+    const currentDomain = `${urlObj.protocol}//${urlObj.host}`
+    const subscriptionUrl = `${currentDomain}/sub/${uniqueToken}`
+    const now = Math.floor(Date.now() / 1000)
+    const expireTime = now + 365 * 24 * 3600 // 1 year
+    const defaultName = "Chilix Tunnel Premium"
+    const totalTraffic = 1024 * 1024 * 1024 * 1024 // 1 TB
+
+    await db.prepare(
+      "INSERT INTO subscriptions (id, user_id, name, subscription_url, total_traffic, used_traffic, expire_time, created_at) VALUES (?, ?, ?, ?, ?, 0, ?, ?)"
+    ).bind(newId, userId, defaultName, subscriptionUrl, totalTraffic, expireTime, now).run()
+
+    // Re-query to get the new database record
+    const rowsNew = await db.prepare(
+      "SELECT id, name, subscription_url, total_traffic, used_traffic, expire_time, created_at FROM subscriptions WHERE user_id = ? ORDER BY created_at DESC"
+    ).bind(userId).all<{
+      id: string; name: string; subscription_url: string
+      total_traffic: number; used_traffic: number; expire_time: number; created_at: number
+    }>()
+
+    results = rowsNew.results.map((r) => ({
+      id: r.id,
+      name: r.name,
+      url: r.subscription_url,
+      traffic_used: r.used_traffic,
+      traffic_total: r.total_traffic,
+      expire_time: r.expire_time,
+      created_at: r.created_at,
+    }))
   }
 
   return c.json({
@@ -77,7 +99,7 @@ subscriptionsRouter.get("/:id", requireAuth, async (c) => {
   return c.json({
     id: sub.id,
     name: sub.name,
-    url: "https://tunnel.chilix.ccwu.cc/sub?token=9acdf66961219ba1406bfd16a1bece07",
+    url: sub.subscription_url,
     traffic_used: sub.used_traffic,
     traffic_total: sub.total_traffic,
     expire_time: sub.expire_time,
