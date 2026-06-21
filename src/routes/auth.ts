@@ -41,20 +41,7 @@ authRouter.post("/register", async (c) => {
     "INSERT INTO users (id, email, password_hash, created_at) VALUES (?, ?, ?, ?)"
   ).bind(id, email, passwordHash, now).run()
 
-  // Issue tokens immediately after registration
-  const secret = c.env.JWT_SECRET
-  const accessToken = await signJWT({ sub: id, email }, secret)
-  const refreshToken = generateRefreshToken()
-  const refreshExpires = now + REFRESH_TOKEN_EXPIRES_IN
-
-  await db.prepare(
-    "INSERT INTO refresh_tokens (token, user_id, expires_at) VALUES (?, ?, ?)"
-  ).bind(refreshToken, id, refreshExpires).run()
-
   return c.json({
-    access_token: accessToken,
-    refresh_token: refreshToken,
-    expires_in: ACCESS_TOKEN_EXPIRES_IN,
     user: { id, email, created_at: now },
   }, 201)
 })
